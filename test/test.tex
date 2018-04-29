@@ -1,0 +1,36 @@
+\documentclass[a4paper]{article}
+\usepackage{geometry} \geometry{a4paper}
+\usepackage[parfill]{parskip}
+\usepackage{graphicx}
+\usepackage[hidelinks]{hyperref}
+
+\usepackage[abbr]{harvard}
+
+
+\title{Test File}
+\author{}
+\date{}
+
+\begin{document} \maketitle
+
+\par{\large{\textbf{First of all, all citations here are apparently wrong. Do not be serious about it. xD}}}\\
+
+\section{cite\_parser}
+\par{This is the first example \cite{lake_tailoring_1998}, and this is the second example \citeaffixed{lock_visibility_2014}{e.g.}. }
+
+\section{subjective\_cite\_parser}
+\par{\citeasnoun{renfrew_investigations_1979} wrote this book in 1979. \possessivecite{lake_tailoring_1998} article was published in 1998. }
+
+\section{partially\_cite\_parser}
+\par{This article is written by \citename{lock_visibility_2014}. We can only cite the year of publication \citeyear{lock_visibility_2014}.}
+
+\section{Word Count}
+\par{This article has 9 words in headings.}
+\par{This article has no word in subsections}
+\par{There are 101 words in the main part (including this part). }
+\par{This article has 110 words in total.}
+
+\newpage
+\bibliographystyle{agsm}
+\bibliography{references}
+\end{document}

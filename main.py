@@ -1,52 +1,47 @@
-from count_cite import count_cite
 from extract_text import extract_text
-from parser import parse_cite, parse_ref
-import re
+from bib2dic import bib2dic
+from parser import cite_parser, subjective_cite_pasrser, partially_cite_parser
 import os
+import re
 
-with open("config", "rU") as config_file:
-    config = config_file.read()
-    # bib_path = re.search(r'bib_path = "(.+)"', config).group(1)
-    tex_path = re.search(r'tex_path = "(.+)"', config).group(1)
+with open("config", "rt") as f:
+    lines = f.read().split(os.linesep)
+tex_path = lines[0].replace("tex path =", "")
+tex_path = re.sub(r"\s", "", tex_path)
+bib_path = lines[1].replace("bib path =", "")
+bib_path = re.sub(r"\s", "", bib_path)
 
-section_list, subsection_list, par_list = extract_text(tex_path)
+with open(tex_path, "rt") as f:
+    tex = f.read()
+section_list, subsection_list, par_list = extract_text(tex)
 
+with open(bib_path, "rt") as f:
+    bib = f.read()
+bib_dic = bib2dic(bib)
 
-def count_word(list_of_text):
-    tmp_list = []
-    for each in list_of_text:
-        tmp_list = tmp_list + (each.split(" "))
-    return len(tmp_list)
-
-
-count_headings = count_word(section_list) * 2
-count_subheadings = count_word(subsection_list) * 2
-
-for i in range(len(par_list)):
-    tmp = parse_cite(par_list[i], flag="cite")
-    tmp = parse_cite(tmp, flag="citeasnoun")
-    tmp = parse_cite(tmp, flag="citeyear")
-    tmp = parse_ref(tmp)
-    par_list[i] = tmp
-
-count_par = count_word(par_list)
-
-print(os.linesep + "------------------")
-print("Headings:", count_headings)
-if not count_subheadings:
-    print("Sub-headings", count_subheadings)
-print("Main parts:", count_par)
-print("------------------")
-print(os.linesep + "*** Total:", count_headings + count_subheadings + count_par)
+def list2wordcount(content_list) -> int:
+    count = 0
+    for each in content_list:
+        parsed_s = cite_parser(each, bib_dic, "cite", 0)
+        parsed_s = cite_parser(parsed_s, bib_dic, "citeaffixed", 0)
+        parsed_s = subjective_cite_pasrser(parsed_s, bib_dic, "citeasnoun", 0)
+        parsed_s = subjective_cite_pasrser(parsed_s, bib_dic, "possessivecite", 0)
+        parsed_s = partially_cite_parser(parsed_s, bib_dic, "citename", 0)
+        parsed_s = partially_cite_parser(parsed_s, bib_dic, "citeyear", 0)
+        words = parsed_s.split(" ")
+        while "" in words:
+            words.remove("")
+        count += len(words)
+    return count
 
 
-# text output for debugging use
-# text_output = ""
-# for each in section_list:
-#     text_output += each
-# for each in subsection_list:
-#     text_output += each
-# for each in par_list:
-#     text_output += each
-#
-# print(text_output)
+count_section = list2wordcount(section_list) + len(section_list)
+count_subsection = list2wordcount(subsection_list)
+count_par = list2wordcount(par_list)
+
+print('''Word count for this file:
+    section:    %i
+    subsection: %i
+    par:        %i
+    Total:      %i''' % (count_section, count_subsection, count_par, \
+                         count_section + count_subsection + count_par))

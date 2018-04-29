@@ -2,10 +2,8 @@ import re
 import os
 
 
-def extract_text(tex_file_path):
-    with open(tex_file_path, "rU") as tex_file:
-        full_text = tex_file.read()
-    lines = full_text.split(os.linesep)
+def extract_text(tex_text: str) -> list:
+    lines = tex_text.split(os.linesep)
     section_list = []
     subsection_list = [] 
     par_list = []
@@ -27,3 +25,12 @@ def extract_text(tex_file_path):
         except AttributeError:
             pass
     return section_list, subsection_list, par_list
+
+
+if __name__ == "__main__":
+    with open("test/test.tex", "rt") as f:
+        text = f.read()
+    section_list, subsection_list, par_list = extract_text(text)
+    print(section_list)
+    print(subsection_list)
+    print(par_list)
