@@ -2,3 +2,8 @@ tex path = test/test.tex
 bib path = test/references.bib
 
 # Please note that your path cannot contain spaces.
+
+
+##### Do not modify anything below #####
+Version: 1.0
+Date: 2018-05-07
